@@ -8,46 +8,44 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming_2.10</artifactId>
-            <version>1.6.2</version>
+            <version>1.6.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming-kafka_2.10</artifactId>
-            <version>1.6.2</version>
+            <version>1.6.3</version>
         </dependency>
 		<dependency>
 		    <groupId>com.googlecode.json-simple</groupId>
 		    <artifactId>json-simple</artifactId>
 		    <version>1.1.1</version>
 		</dependency>
-        
+		<dependency>
+		    <groupId>org.apache.spark</groupId>
+		    <artifactId>spark-sql_2.10</artifactId>
+		    <version>1.6.3</version>
+		</dependency>        
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.4.4</version>
+		</dependency>		
+		<dependency>
+		  <groupId>org.apache.spark</groupId>
+		  <artifactId>spark-hive_2.10</artifactId>
+		  <version>1.6.3</version>
+		</dependency>		
+		<dependency>
+		    <groupId>com.databricks</groupId>
+		    <artifactId>spark-csv_2.10</artifactId>
+		    <version>1.2.0</version>
+		</dependency>
+				
     </dependencies>  
     
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/scripts</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/scripts</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -82,8 +80,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -96,7 +94,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.pwc.securityAnalytics.example.HelloUser</mainClass>
+							<mainClass>com.poc.example.Demo</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

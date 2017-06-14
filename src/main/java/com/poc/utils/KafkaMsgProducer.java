@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
@@ -32,11 +33,13 @@ public class KafkaMsgProducer {
 
         Random rnd = new Random();
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
-
-        FileReader jsonFileReader = new FileReader(KafkaMsgProducer.class.getResource("/service_now.json").getFile());
+        
+        InputStream jsonInputStream = KafkaMsgProducer.class.getResourceAsStream("/service_now.json");
+        
+//        FileReader jsonFileReader = new FileReader(KafkaMsgProducer.class.getResource("service_now.json").getFile());
         JSONParser parser = new JSONParser();
 
-        JSONObject jsonObject = (JSONObject) parser.parse(jsonFileReader);
+        JSONObject jsonObject = (JSONObject) parser.parse( new InputStreamReader(jsonInputStream, "UTF-8"));
         System.out.println(jsonObject);
         
         JSONArray jsonArray = (JSONArray) jsonObject.get("result");
