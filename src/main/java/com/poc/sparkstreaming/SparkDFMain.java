@@ -1,34 +1,28 @@
 package com.poc.sparkstreaming;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.types.StructType;
-import org.apache.spark.storage.StorageLevel;
-import org.apache.spark.streaming.Durations;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.apache.spark.sql.hive.HiveContext;
+import org.json.simple.parser.ParseException;
 
-import com.poc.utils.KafkaMsgProducer;
-
-import kafka.serializer.StringDecoder;
-import scala.Tuple2;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poc.datamodel.ServiceNowModel;
+import com.poc.test.Person;
 
 public class SparkDFMain {
 
 	public SparkDFMain() {
 		// TODO Auto-generated constructor stub
 	}
-	public static void main(String[] args) throws IOException{
+	
+
+	public static void main(String[] args) throws IOException, ParseException{
 		
 		
 //        String topic = args[0];
@@ -47,17 +41,55 @@ public class SparkDFMain {
 //		JavaStreamingContext jssc = new JavaStreamingContext(sparkConf , Durations.milliseconds(5000));
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
 		SQLContext sqlContext = new SQLContext(jsc);
+		HiveContext hiveContext = new org.apache.spark.sql.hive.HiveContext(jsc.sc());
 		
 		String jsonFilepath = SparkDFMain.class.getResource("/service_now.json").getFile();
 		
-		DataFrame df = sqlContext.read().json(jsonFilepath).toDF();
-	    df.registerTempTable("df");
-	    StructType schema = df.schema();
-	    Class<? extends StructType> sc = schema.getClass();
-	    System.out.println(schema);
-	    
-	    df.printSchema();
-
+		JavaRDD<String> jrdd = jsc.textFile("C:/INTEG/temp/person.txt"); 
+		JavaRDD<String> snowrdd = jsc.textFile("C:/INTEG/temp/service_now.json");
+		
+        
+//		DataFrame df = sqlContext.read().json(jsonFilepath).toDF();
+//	    df.registerTempTable("df");
+//	    StructType schema = df.schema();
+//	    Class<? extends StructType> sc = schema.getClass();
+//	    System.out.println(schema);
+//	    df.printSchema();
+		
+		JavaRDD<Person> prdd = jrdd.map(new Function<String, Person>() {
+			public Person call(String v1) throws Exception {
+				ObjectMapper mapper = new ObjectMapper();
+				Person p = mapper.readValue(v1, Person.class);
+				System.out.println(p);
+				return p;
+			}
+		});
+		
+		DataFrame pdf = hiveContext.createDataFrame(prdd, Person.class);
+		
+		pdf.printSchema();
+		pdf.show();
+		
+		
+//		JavaRDD<ServiceNowModel> snowrdd2 = snowrdd.map(new Function<String, ServiceNowModel>() {
+//
+//			public ServiceNowModel call(String v1) throws Exception {
+//				ObjectMapper objectMapper = new ObjectMapper();
+//				ServiceNowModel snow = objectMapper.readValue(v1, ServiceNowModel.class);		
+//				System.out.println(snow);
+//				return snow;
+//			}
+//		});
+//		DataFrame snowdf = hiveContext.createDataFrame(snowrdd2, ServiceNowModel.class);
+//		
+////		snowdf.printSchema();
+//		
+//		DataFrame newDF = snowdf.coalesce(1);
+//		
+//		newDF.printSchema();
+//		newDF.show();
+//		snowdf.show();
+		
 //		jssc.start();
 //		jssc.awaitTermination();
 	}
